@@ -8,3 +8,7 @@ button.switch-data{
 .hide-key {
    display:none;
 }
+a {
+    clear:both;
+    display:block;
+}

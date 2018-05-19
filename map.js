@@ -17,9 +17,9 @@ var toggle = true;
 
 var key;
 var x = d3.scaleSqrt()
-.rangeRound([width/2,width ]);
+.rangeRound([width/2,width ]).nice();
 var x2 = d3.scaleSqrt()
-    .rangeRound([width/2, width]);
+    .rangeRound([width/2, width]).nice();
 function mergeGeoData(data){
     var orderByName = function(a,b) {
         return a.name < b.name ? -1 : a.name === b.name ? 0 : 1;
@@ -30,7 +30,7 @@ function mergeGeoData(data){
     
     for(var i = 0; i < data[0].features.length; i++){
         data[0].features[i].properties['population'] = +data[1][i].population.replace(/,/g ,"").replace(/\./g, '');
-        data[0].features[i].properties['violence'] = +data[2][i].percentage;
+        data[0].features[i].properties['violence'] = +(data[2][i].percentage/100);
     }
     return data;
 }
@@ -53,7 +53,7 @@ function init() {
     
     
     Promise.all([getGeoData(uri),getGeoCSV("./state_population.csv"),getGeoCSV("./violence.csv")])
-    .then(mergeGeoData).then(setUpMap);
+    .then(mergeGeoData).then(setUpMap).then(addHTML);
 }
     
 function setUpMap(data){
@@ -83,7 +83,7 @@ function setUpMap(data){
     
     key.call(d3.axisBottom(x)
     .tickSize(13)
-    .tickValues(color.domain()))
+    .tickValues(color.domain()).ticks(5).tickArguments([20,"s"]))
     .select(".domain")
     .remove();
     
@@ -104,7 +104,7 @@ function setUpMap(data){
     
     key2.call(d3.axisBottom(x2)
     .tickSize(13)
-    .tickValues(v_color.domain()))
+    .tickValues(v_color.domain()).tickArguments([20,"%"]))
     .select(".domain")
     .remove();
     
@@ -119,6 +119,20 @@ function setUpMap(data){
         .style("stroke","rgb(0,0,0)");
     
     d3.select(".switch-data").on("click", changeData);
+    
+    svg.append("g")
+        .attr("id", "population-title")
+        .attr("x", width/2)
+        .append("text")
+        .text("Brazilian Population 2014");
+    
+     svg.append("g")
+        .attr("id", "crime-title")
+        .attr("class","hide-key")
+        .attr("x", width/2)
+        .append("text")
+        .text("Brazilian Crime by Percentage of Population 2013");
+        
     
 }
 function setColorDomains(data){
@@ -180,6 +194,8 @@ function changeData(){
             d3.select(this).style("fill", function(d){ return v_color(d.properties.violence); });
         });
         d3.select("#crime").classed("hide-key", false);
+        d3.select("#crime-title").classed("hide-key",false);
+        d3.select("#population-title").classed("hide-key",true);
         d3.select("#population").classed("hide-key",true);
         
     }else {
@@ -188,12 +204,35 @@ function changeData(){
             d3.select(this).style("fill", function(d){ return color(d.properties.population); });
         }); 
         d3.select("#population").classed("hide-key", false);
+        d3.select("#population-title").classed("hide-key",false);
+        d3.select("#crime-title").classed("hide-key",true);
         d3.select("#crime").classed("hide-key",true);
     }
     toggle = !toggle;
     
 }
+   
+function addHTML(){
+    var body = d3.select("body");
+    body
+        .append('a')
+        .attr('href', "https://ww2.ibge.gov.br/english/estatistica/populacao/contagem2007/default.shtm" )
+        .text('IBGE (Brazilian Institute of Geography & Statistics');
     
+    body.append('a')
+        .attr('href', "https://ww2.ibge.gov.br/english/estatistica/populacao/contagem2007/default.shtm" )
+        .text('World Population Review');
+    
+    body.append('a')
+        .attr('href', "http://2015.index.okfn.org/place/brazil/statistics" )
+        .text('Global Open Data Index');
+    
+    body.append('a')
+        .attr('href', "https://downloads.ibge.gov.br/downloads_estatisticas.htm#" )
+        .text('IBGE Download Data');
+    
+    
+}
 return {
     init: init,
     color: color,
