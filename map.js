@@ -124,14 +124,16 @@ function setUpMap(data){
         .attr("id", "population-title")
         .attr("x", width/2)
         .append("text")
-        .text("Brazilian Population 2014");
+        .text("Brazilian Population 2014")
+        .style("font-weight", "bold");
     
      svg.append("g")
         .attr("id", "crime-title")
         .attr("class","hide-key")
         .attr("x", width/2)
         .append("text")
-        .text("Brazilian Crime by Percentage of Population 2013");
+        .text("Brazilian Crime by Percentage of Population 2013")
+        .style("font-weight", "bold");
         
     addHTML();
 }
