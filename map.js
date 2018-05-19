@@ -53,7 +53,7 @@ function init() {
     
     
     Promise.all([getGeoData(uri),getGeoCSV("./state_population.csv"),getGeoCSV("./violence.csv")])
-    .then(mergeGeoData).then(setUpMap).then(addHTML);
+    .then(mergeGeoData).then(setUpMap);
 }
     
 function setUpMap(data){
@@ -133,7 +133,7 @@ function setUpMap(data){
         .append("text")
         .text("Brazilian Crime by Percentage of Population 2013");
         
-    
+    addHTML();
 }
 function setColorDomains(data){
     color.domain([
